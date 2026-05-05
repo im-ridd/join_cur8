@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Created — cur8</title>
+  <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="hero">
+      <img src="/img/cur8-logo.png" alt="cur8" class="logo" onerror="this.style.display='none'" />
+      <h1>🎉 Account Created!</h1>
+      <p class="subtitle">Welcome to Steem, <strong id="username-display">@username</strong></p>
+    </header>
+
+    <main class="card">
+      <!-- Warning Banner -->
+      <div class="warning-banner">
+        <span class="warning-icon">⚠️</span>
+        <div>
+          <strong>Save your keys NOW — they will not be shown again.</strong>
+          <p>If you lose these keys, no one can recover your account. Download or copy them before leaving this page.</p>
+        </div>
+      </div>
+
+      <!-- Keys Display -->
+      <div id="keys-section">
+        <div class="key-card" id="key-master">
+          <div class="key-header">
+            <span class="key-label">Master Password</span>
+            <span class="key-desc">Can derive all other keys. Keep offline.</span>
+          </div>
+          <div class="key-value-row">
+            <code class="key-value" id="val-master"></code>
+            <button class="btn-copy" data-target="val-master" title="Copy">📋</button>
+          </div>
+        </div>
+
+        <div class="key-card">
+          <div class="key-header">
+            <span class="key-label">Posting Key</span>
+            <span class="key-desc">Use for day-to-day posts, votes, comments</span>
+          </div>
+          <div class="key-value-row">
+            <code class="key-value" id="val-posting"></code>
+            <button class="btn-copy" data-target="val-posting" title="Copy">📋</button>
+          </div>
+        </div>
+
+        <div class="key-card">
+          <div class="key-header">
+            <span class="key-label">Active Key</span>
+            <span class="key-desc">For transfers, powerups, and wallet operations</span>
+          </div>
+          <div class="key-value-row">
+            <code class="key-value" id="val-active"></code>
+            <button class="btn-copy" data-target="val-active" title="Copy">📋</button>
+          </div>
+        </div>
+
+        <div class="key-card">
+          <div class="key-header">
+            <span class="key-label">Owner Key</span>
+            <span class="key-desc">Account recovery only — store extremely securely</span>
+          </div>
+          <div class="key-value-row">
+            <code class="key-value" id="val-owner"></code>
+            <button class="btn-copy" data-target="val-owner" title="Copy">📋</button>
+          </div>
+        </div>
+
+        <div class="key-card">
+          <div class="key-header">
+            <span class="key-label">Memo Key</span>
+            <span class="key-desc">For encrypted memos in transfers</span>
+          </div>
+          <div class="key-value-row">
+            <code class="key-value" id="val-memo"></code>
+            <button class="btn-copy" data-target="val-memo" title="Copy">📋</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Download Buttons -->
+      <div class="download-row">
+        <button class="btn btn-primary" id="btn-download-txt">&#11015; Download keys (.txt)</button>
+      </div>
+
+      <!-- Already created message (shown when keys are gone from sessionStorage) -->
+      <div id="already-created-msg" class="hidden" style="text-align:center;padding:2rem 0">
+        <p style="font-size:2rem">✅</p>
+        <h2>Your Steem account was created</h2>
+        <p class="hint">The keys were already shown and cleared from this session for security.<br>If you saved them, you're all set!</p>
+        <a href="https://cur8.fun" class="btn btn-primary" style="display:inline-block;margin-top:1rem">Go to cur8.fun</a>
+      </div>
+
+      <!-- Confirmation checkbox -->
+      <label class="confirm-label">
+        <input type="checkbox" id="confirm-saved" />
+        I have saved my keys securely
+      </label>
+
+      <!-- Next steps -->
+      <div id="next-steps" class="hidden">
+        <div class="divider"><span>What's next?</span></div>
+        <div class="next-grid">
+          <a href="https://games.cur8.fun" target="_blank" class="next-card">
+            <span class="next-icon">🎮</span>
+            <strong>Play on Cur8 Games</strong>
+            <small>Start earning XP and rewards</small>
+          </a>
+          <a href="https://cur8.fun" target="_blank" class="next-card">
+            <span class="next-icon">✍️</span>
+            <strong>Post on cur8.fun</strong>
+            <small>Share your first post</small>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/success.js"></script>
+</body>
+</html>

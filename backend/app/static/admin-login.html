@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login — join.cur8.fun</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #0f1117; color: #e8eaf0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .page-wrapper { width: 100%; max-width: 380px; padding: 16px; }
+    .hero { text-align: center; margin-bottom: 24px; }
+    .hero h1 { font-size: 1.75rem; font-weight: 700; }
+    .hero .subtitle { color: #8b92b3; margin-top: 4px; }
+    .card { background: #1a1d27; border: 1px solid #2d3250; border-radius: 16px; padding: 32px; }
+    .input-group { margin-bottom: 12px; }
+    .input-group input { width: 100%; padding: 12px 16px; background: #0f1117; border: 1px solid #2d3250; border-radius: 10px; color: #e8eaf0; font-size: 1rem; outline: none; }
+    .input-group input:focus { border-color: #7c5cfc; }
+    .btn { display: block; width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .btn-primary { background: #7c5cfc; color: #fff; }
+    .btn-primary:hover { background: #6b4eeb; }
+    .error-msg { margin-top: 12px; color: #ef4444; font-size: .875rem; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="hero">
+      <h1>Admin Panel</h1>
+      <p class="subtitle">join.cur8.fun</p>
+    </header>
+    <main class="card">
+      <div class="input-group">
+        <input type="text" id="username" placeholder="Username" autocomplete="username" />
+      </div>
+      <div class="input-group">
+        <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
+      </div>
+      <button class="btn btn-primary" id="btn-login">Login</button>
+      <div id="error" class="error-msg hidden"></div>
+    </main>
+  </div>
+  <script>
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errEl = document.getElementById('error');
+      errEl.classList.add('hidden');
+      try {
+        const res = await fetch('/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Login failed');
+        // Redirect back to frontend admin panel
+        const frontendBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:3001'
+          : '';
+        window.location.href = frontendBase + '/admin/';
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove('hidden');
+      }
+    });
+    document.getElementById('password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('btn-login').click();
+    });
+  </script>
+</body>
+</html>

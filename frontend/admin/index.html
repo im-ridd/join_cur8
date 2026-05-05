@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>if (location.port === '3001' || location.port === '3000') { location.replace('http://' + location.hostname + ':8002/admin/'); }</script>
+  <title>Admin — join.cur8.fun</title>
+  <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2d3250;
+      --accent: #7c5cfc; --text: #e8eaf0; --text-muted: #8b92b3;
+      --success: #22c55e; --error: #ef4444; --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+    .sidebar {
+      width: 220px; background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0;
+    }
+    .sidebar-title { font-weight: 700; font-size: 1rem; margin-bottom: 24px; color: var(--accent); }
+    .nav-link {
+      display: block; padding: 9px 12px; border-radius: 8px; text-decoration: none;
+      color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px; transition: all 0.15s;
+    }
+    .nav-link:hover, .nav-link.active { background: var(--surface2); color: var(--text); }
+    .sidebar-footer { margin-top: auto; }
+    .btn-logout { background: none; border: 1px solid var(--border); color: var(--text-muted);
+      padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; width: 100%; }
+    .btn-logout:hover { background: var(--surface2); }
+
+    .main { flex: 1; overflow-y: auto; padding: 32px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    h2 { font-size: 1.4rem; margin-bottom: 20px; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+    .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--accent); }
+    .stat-card .label { color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th { background: var(--surface2); padding: 10px 14px; text-align: left; color: var(--text-muted); font-weight: 500; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:hover td { background: var(--surface2); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; }
+    .badge-ok { background: rgba(34,197,94,0.15); color: var(--success); }
+    .badge-pending { background: rgba(245,158,11,0.15); color: var(--warning); }
+
+    .settings-grid { display: grid; gap: 16px; max-width: 480px; }
+    .setting-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .setting-row label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
+    .setting-row input { width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); padding: 9px 12px; font-size: 0.9rem; outline: none; }
+    .setting-row input:focus { border-color: var(--accent); }
+
+    .btn { padding: 9px 18px; border-radius: 8px; font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #6b4de8; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-sm { padding: 5px 12px; font-size: 0.8rem; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-danger { background: rgba(239,68,68,0.15); color: var(--error); border: 1px solid rgba(239,68,68,0.3); }
+    .btn-danger:hover { background: rgba(239,68,68,0.3); }
+
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .filter-bar input, .filter-bar select {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: 8px 12px; font-size: 0.875rem; outline: none;
+    }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); }
+
+    .pagination { display: flex; gap: 8px; margin-top: 16px; align-items: center; color: var(--text-muted); font-size: 0.875rem; }
+    .pagination button { padding: 5px 12px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); cursor: pointer; font-size: 0.875rem; }
+    .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .top-referrers { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+    .top-referrers h3 { font-size: 1rem; margin-bottom: 14px; }
+    .ref-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+    .ref-row:last-child { border-bottom: none; }
+    .ref-count { color: var(--accent); font-weight: 600; }
+
+    .msg { padding: 10px 14px; border-radius: 8px; font-size: 0.875rem; margin-top: 10px; min-height: 20px; }
+    .msg-ok { background: rgba(34,197,94,0.1); color: var(--success); border: 1px solid rgba(34,197,94,0.3); }
+    .msg-err { background: rgba(239,68,68,0.1); color: var(--error); border: 1px solid rgba(239,68,68,0.3); }
+
+    .inline-input {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text); padding: 4px 8px; font-size: 0.875rem; outline: none;
+    }
+    .inline-input:focus { border-color: var(--accent); }
+
+    #login-overlay {
+      display: none; position: fixed; inset: 0; background: var(--bg);
+      z-index: 9999; align-items: center; justify-content: center;
+    }
+    #login-overlay.active { display: flex; }
+    .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 360px; }
+    .login-box h2 { margin-bottom: 24px; font-size: 1.3rem; color: var(--accent); }
+    .login-box input { display: block; width: 100%; padding: 11px 14px; margin-bottom: 12px;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-size: 0.95rem; outline: none; }
+    .login-box input:focus { border-color: var(--accent); }
+    .login-box .btn-primary { width: 100%; padding: 11px; font-size: 1rem; }
+    .login-err { color: var(--error); font-size: 0.85rem; margin-top: 10px; min-height: 20px; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-title">cur8 Admin</div>
+    <a class="nav-link active" data-page="dashboard" href="#">📊 Dashboard</a>
+    <a class="nav-link" data-page="users" href="#">👤 Users</a>
+    <a class="nav-link" data-page="referrer-settings" href="#">⚙️ Referrer Settings</a>
+    <a class="nav-link" data-page="delegations" href="#">🔗 Delegations</a>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btn-logout">← Logout</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <!-- Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <h2>Dashboard</h2>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="value" id="stat-accounts">–</div><div class="label">Accounts Created</div></div>
+        <div class="stat-card"><div class="value" id="stat-referrers">–</div><div class="label">Active Referrers</div></div>
+      </div>
+      <div class="top-referrers">
+        <h3>Top Referrers</h3>
+        <div id="top-referrers-list"><div style="color:var(--text-muted);font-size:.875rem">Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div class="page" id="page-users">
+      <h2>Users</h2>
+      <div class="filter-bar">
+        <input type="text" id="filter-user-search" placeholder="Search username or email…" />
+        <select id="filter-user-auth">
+          <option value="">All providers</option>
+          <option value="google">Google</option>
+          <option value="email">Email</option>
+        </select>
+        <select id="filter-user-created">
+          <option value="">All statuses</option>
+          <option value="true">Account created</option>
+          <option value="false">Pending</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" id="btn-filter-users">Apply</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Steem Username</th><th>Email</th><th>Auth</th><th>Referrer</th><th>Account Created</th><th>Joined</th><th style="width:120px"></th></tr></thead>
+          <tbody id="users-tbody"><tr><td colspan="6" style="color:var(--text-muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button id="btn-users-prev" disabled>← Prev</button>
+        <span id="users-page-info">Page 1</span>
+        <button id="btn-users-next">Next →</button>
+      </div>
+    </div>
+
+    <!-- Referrer Settings -->
+    <div class="page" id="page-referrer-settings">
+      <h2>Referrer Settings</h2>
+      <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:16px">
+        Set the beneficiary % for each referrer. Used by games.cur8.fun when a referred user publishes a post. Default: 5%.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Referrer</th><th>Referred Users</th><th>Beneficiary %</th><th>Notes</th><th></th></tr></thead>
+          <tbody id="referrer-configs-tbody"><tr><td colspan="5" style="color:var(--text-muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div id="referrer-configs-msg" class="msg"></div>
+    </div>
+
+    <!-- Delegations -->
+    <div class="page" id="page-delegations">
+      <h2>Delegations to cur8</h2>
+      <div class="filter-bar">
+        <button class="btn btn-primary btn-sm" id="btn-refresh-delegations">🔄 Refresh from chain</button>
+        <span id="delegations-last-update" style="color:var(--text-muted);font-size:.8rem"></span>
+      </div>
+      <div id="delegations-msg" class="msg"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Steem Username</th><th>Referrer</th><th>Delegation to cur8</th><th>Delegation Set On</th><th>Last Scanned</th></tr></thead>
+          <tbody id="delegations-tbody"><tr><td colspan="4" style="color:var(--text-muted)">Click "Refresh" to load delegation data from the chain.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Edit User Modal -->
+  <div id="edit-user-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9998;align-items:center;justify-content:center">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:400px">
+      <h3 style="margin-bottom:20px;font-size:1.1rem">Edit User</h3>
+      <input type="hidden" id="edit-user-id" />
+      <label style="display:block;margin-bottom:6px;font-size:.85rem;color:var(--text-muted)">Steem Username</label>
+      <input type="text" id="edit-user-steem" placeholder="steemUsername" style="display:block;width:100%;padding:10px 12px;margin-bottom:14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.95rem" />
+      <label style="display:block;margin-bottom:6px;font-size:.85rem;color:var(--text-muted)">Referrer (Steem username)</label>
+      <input type="text" id="edit-user-referrer" placeholder="referrerUsername" style="display:block;width:100%;padding:10px 12px;margin-bottom:20px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.95rem" />
+      <div id="edit-user-err" style="color:var(--error);font-size:.85rem;min-height:18px;margin-bottom:12px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn btn-secondary btn-sm" id="btn-edit-user-cancel">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="btn-edit-user-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login overlay -->
+  <div id="login-overlay">
+    <div class="login-box">
+      <h2>cur8 Admin</h2>
+      <input type="text" id="login-user" placeholder="Username" autocomplete="username" />
+      <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" />
+      <button class="btn btn-primary" id="btn-do-login">Login</button>
+      <div class="login-err" id="login-err"></div>
+    </div>
+  </div>
+
+  <script src="/admin-ui/admin.js"></script>
+</body>
+</html>
