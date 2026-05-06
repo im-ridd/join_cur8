@@ -27,4 +27,4 @@ services:
 
 networks:
   cur8-network:
-    external: true
+    driver: bridge
