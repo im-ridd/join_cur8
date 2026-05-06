@@ -272,7 +272,9 @@ async function validateReferrer(val) {
   try {
     const data = await api(`/api/steem/check-username/${val}`);
     if (referrerInput.value.trim() !== val) return; // input changed meanwhile
-    if (data.available) {
+    // available=true → account free (doesn't exist); reason set → invalid format
+    // Both cases mean it's NOT a valid referrer
+    if (data.available || data.reason) {
       referrerStatus.textContent = '❌';
       referrerInput.dataset.valid = 'false';
     } else {

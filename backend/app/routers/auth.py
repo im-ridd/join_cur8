@@ -18,6 +18,20 @@ from ..database import get_db
 from ..models import JoinUser
 from ..schemas import EmailRegisterRequest, EmailVerifyOTPRequest
 from ..email_utils import validate_email_address
+from ..steem_utils import account_exists_on_chain
+
+
+def _validate_referrer(referrer: Optional[str]) -> Optional[str]:
+    """Return cleaned referrer if it exists on Steem chain, else None."""
+    if not referrer:
+        return None
+    ref = referrer.strip().lower()
+    try:
+        if account_exists_on_chain(ref):
+            return ref
+    except Exception:
+        pass
+    return None
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -96,7 +110,7 @@ async def google_callback(request: Request, response: Response, db: Session = De
     userinfo = token.get("userinfo") or {}
     google_id = userinfo.get("sub")
     email = userinfo.get("email")
-    referrer = request.session.pop("oauth_referrer", None)
+    referrer = _validate_referrer(request.session.pop("oauth_referrer", None))
 
     if not google_id:
         raise HTTPException(status_code=400, detail="Could not get Google user info")
@@ -203,7 +217,7 @@ async def email_send_otp(req: EmailRegisterRequest, db: Session = Depends(get_db
             auth_provider="email",
             auth_id=req.email,
             email=req.email,
-            referrer_steem=req.referrer or None,
+            referrer_steem=_validate_referrer(req.referrer),
             email_otp=code,
             email_otp_expires=expires,
         )

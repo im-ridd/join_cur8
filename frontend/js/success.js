@@ -13,6 +13,9 @@ if (!keys) {
   // Keys are gone (already viewed or navigated directly) — show static message
   document.getElementById('keys-section').classList.add('hidden');
   document.getElementById('already-created-msg').classList.remove('hidden');
+  document.querySelector('.warning-banner').classList.add('hidden');
+  document.querySelector('.download-row').classList.add('hidden');
+  document.querySelector('.confirm-label').classList.add('hidden');
 } else {
 
 // ── Populate UI ───────────────────────────────────────────────────────────────

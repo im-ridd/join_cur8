@@ -22,6 +22,8 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 .page-wrapper {
@@ -285,3 +287,13 @@ body {
 
 /* Utility */
 .hidden { display: none !important; }
+
+/* ── Mobile fixes ── */
+@media (max-width: 480px) {
+  .page-wrapper { padding: 20px 14px 48px; }
+  .hero h1 { font-size: 1.4rem; }
+  .card { padding: 20px 16px; }
+  .btn-row { grid-template-columns: 1fr; }
+  .key-value { font-size: 0.72rem; }
+  .next-grid { grid-template-columns: repeat(2, 1fr); max-width: 100%; }
+}
