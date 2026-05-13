@@ -28,21 +28,27 @@ CREATOR_ACTIVE_KEY = os.getenv("STEEM_ACTIVE_KEY", "")
 
 
 def validate_account_name(name: str) -> str | None:
-    """Returns an error message string if invalid, None if valid."""
+    """Validate Steem account name per official blockchain rules.
+    Returns an error message string if invalid, None if valid.
+    Rules apply per-segment (segments separated by '.').
+    """
     if not name:
         return "Username cannot be empty"
-    if len(name) < 3:
-        return "Too short (min 3 characters)"
     if len(name) > 16:
         return "Too long (max 16 characters)"
-    if re.search(r'[^a-z0-9-]', name):
-        return "Only lowercase letters, digits and hyphens allowed"
-    if re.match(r'^[^a-z]', name):
-        return "Must start with a letter"
-    if re.search(r'[^a-z0-9]$', name):
-        return "Must end with a letter or digit"
-    if '--' in name:
-        return "Cannot contain consecutive hyphens (--)"
+
+    segments = name.split('.')
+    for seg in segments:
+        if len(seg) < 3:
+            return "Each part (around dots) must be at least 3 characters"
+        if not re.match(r'^[a-z]', seg):
+            return "Each part must start with a letter"
+        if not re.search(r'[a-z0-9]$', seg):
+            return "Each part must end with a letter or digit"
+        if re.search(r'[^a-z0-9\-]', seg):
+            return "Only lowercase letters, digits and hyphens allowed"
+        if '--' in seg:
+            return "Cannot contain consecutive hyphens (--)"
     return None
 
 

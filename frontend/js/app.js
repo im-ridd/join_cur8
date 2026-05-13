@@ -202,13 +202,16 @@ document.getElementById('email-otp-input').addEventListener('keydown', (e) => {
 // ── Steem account name validation (mirrors steem-js rules) ───────────────────
 function validateSteemUsername(name) {
   if (!name) return 'Username cannot be empty';
-  if (name.length < 3) return 'Too short (min 3 characters)';
   if (name.length > 16) return 'Too long (max 16 characters)';
-  if (/[^a-z0-9-]/.test(name)) return 'Only lowercase letters, digits and hyphens allowed';
-  if (/^[^a-z]/.test(name)) return 'Must start with a letter';
-  if (/[^a-z0-9]$/.test(name)) return 'Must end with a letter or digit';
-  if (/--/.test(name)) return 'Cannot contain consecutive hyphens (--)';
-  return null; // valid
+  const segments = name.split('.');
+  for (const seg of segments) {
+    if (seg.length < 3) return 'Each part (around dots) must be at least 3 characters';
+    if (!/^[a-z]/.test(seg)) return 'Each part must start with a letter';
+    if (!/[a-z0-9]$/.test(seg)) return 'Each part must end with a letter or digit';
+    if (/[^a-z0-9\-]/.test(seg)) return 'Only lowercase letters, digits and hyphens allowed';
+    if (/--/.test(seg)) return 'Cannot contain consecutive hyphens (--)'; 
+  }
+  return null;
 }
 
 // ── Username availability check ───────────────────────────────────────────────
